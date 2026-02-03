@@ -1,0 +1,43 @@
+services:
+  mongo:
+    image: mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - mongo:/data/db
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+      ME_CONFIG_MONGODB_URL: "mongodb://root:example@mongo:27017/"
+
+  golang-project:
+    container_name: "go-webcrawler"
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    image: golang-project
+    depends_on:
+      - mongo
+    deploy:
+      mode: replicated
+      replicas: 1
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
+
+volumes:
+  mongo:
