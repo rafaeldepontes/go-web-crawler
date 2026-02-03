@@ -5,7 +5,7 @@ import (
 	"sync"
 )
 
-var memory = make(map[string]bool)
+var memory = make(map[string]struct{})
 var wg sync.WaitGroup
 var mut sync.Mutex
 
@@ -29,7 +29,7 @@ func Crawl(url string, depth int, fetcher Fetcher) {
 		mut.Unlock()
 		return
 	}
-	memory[url] = true
+	memory[url] = struct{}{}
 	mut.Unlock()
 
 	body, urls, err := fetcher.Fetch(url)
